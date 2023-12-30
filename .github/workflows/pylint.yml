@@ -20,4 +20,4 @@ jobs:
         python -m pip install -r requirements.txt
     - name: Run Program
       run: |
-        python main.py -h
+        python main.py --help
