@@ -1,6 +1,6 @@
 # LethalCompanySaveEditor
 
-**A simple save editor for Lethal Company, written in Python 3.11**
+**A simple save editor for Lethal Company, written in Python 3.11 for python versions higher than 3.10**
 This should work for any project that utilizes ES3 Saves with encryption, you'll need the save location and the decryption password
 
 ## Features
