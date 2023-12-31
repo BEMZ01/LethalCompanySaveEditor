@@ -289,7 +289,9 @@ def add_keys():
 
 
 if __name__ == "__main__":
-    # Check flags for password
+    if "-h" in sys.argv or "--help" in sys.argv:
+        print("Usage: python main.py [-p password] [-sf save_folder_path]")
+        exit(0)
     if "-p" in sys.argv:
         try:
             PASSWORD = str(sys.argv[sys.argv.index("-p") + 1])
