@@ -32,10 +32,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: autobuild-${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: autobuild-${{ github.event.head_commit.timestamp }}
+          release_name: Release ${{ github.ref }} (${{ github.event.head_commit.timestamp }})
           body: |
             Release for ${{ github.event.head_commit.message }}
+            Committed at ${{ github.event.head_commit.timestamp }} by ${{ github.event.head_commit.author.name }}
+            
+            Commit message: ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
