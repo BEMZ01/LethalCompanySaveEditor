@@ -34,7 +34,6 @@ jobs:
         with:
           tag_name: ${{ github.event.head_commit.message }}
           release_name: ${{ github.event.head_commit.message }}
-          overwrite: true
           body: |
             Release for ${{ github.event.head_commit.message }}
           draft: false
