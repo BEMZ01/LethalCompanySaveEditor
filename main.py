@@ -1,4 +1,5 @@
 #  A Lethal Company Save Editor
+#  Version 1.0.0
 #  Author: BEMZlabs
 import copy
 import os
