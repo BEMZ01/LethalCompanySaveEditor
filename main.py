@@ -1,5 +1,4 @@
 #  A Lethal Company Save Editor
-#  Version 1.1.0
 #  Author: BEMZlabs
 import copy
 import os
@@ -12,6 +11,8 @@ from termcolor import colored
 import logging
 import traceback
 import pyperclip
+
+VERSION = 1.1
 
 os.system('color')
 PASSWORD = "lcslime14a5"
@@ -83,13 +84,11 @@ def check_for_updates():
         if r.status_code != 200:
             logger.error("Error checking for updates. Status code not okay.")
             return False
-        online_version = r.text.split('\n')[1].split(' ')[3].strip()
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "main.py"), "r") as f:
-            local_version = f.readlines()[1].split(' ')[3].strip()
+        online_version = float(r.text.split('\n')[14].split(' = ')[1])
+        local_version = float(VERSION)
         logger.info(f"Found version {online_version} online.")
         logger.info(f"Found version {local_version} locally.")
-        # The version number is stored in the second line of the file as a comment in the format # Version x.x.x
-        # remove last . and convert to float
+        # The version number is a float stored on line 15 of main.py
         try:
             formatted_online_version = float(online_version.replace(".", "", online_version.count(".") - 1))
             formatted_local_version = float(local_version.replace(".", "", local_version.count(".") - 1))
@@ -214,7 +213,8 @@ def edit_save():
                 try:
                     value = demjson3.decode(value)
                 except demjson3.JSONDecodeError:
-                    logger.error(f"Invalid value. (Didn't match System.Int32[],mscorlib format)\n{traceback.format_exc()}")
+                    logger.error(
+                        f"Invalid value. (Didn't match System.Int32[],mscorlib format)\n{traceback.format_exc()}")
                     print("Invalid value. (Didn't match System.Int32[],mscorlib format)")
                     continue
             elif expected_type == "UnityEngine.Vector3[],UnityEngine.CoreModule":
