@@ -12,7 +12,7 @@ import logging
 import traceback
 import pyperclip
 
-VERSION = 1.1
+VERSION = 1.2
 
 os.system('color')
 PASSWORD = "lcslime14a5"
@@ -88,23 +88,15 @@ def check_for_updates():
         local_version = float(VERSION)
         logger.info(f"Found version {online_version} online.")
         logger.info(f"Found version {local_version} locally.")
-        # The version number is a float stored on line 15 of main.py
-        try:
-            formatted_online_version = float(online_version.replace(".", "", online_version.count(".") - 1))
-            formatted_local_version = float(local_version.replace(".", "", local_version.count(".") - 1))
-        except ValueError or TypeError:
-            logger.error(f"Error checking for updates.\n{traceback.format_exc()}")
-            return False
-
-        if formatted_online_version > formatted_local_version:
+        if online_version > local_version:
             logger.warning("Update available!")
             print("Update available! Download at https://github.com/BEMZ01/LethalCompanySaveEditor/releases/latest")
             return True
-        elif formatted_online_version == formatted_local_version:
+        elif online_version == local_version:
             logger.info("No updates available.")
             print("No updates available.")
             return False
-        elif formatted_online_version < formatted_local_version:
+        elif online_version < local_version:
             logger.warning("You are running a newer version than the latest release.")
             print("You are running a newer version than the latest release.")
             return False
