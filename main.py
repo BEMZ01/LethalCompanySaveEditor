@@ -8,9 +8,12 @@ import requests
 import demjson3
 from utils.encryption import decrypt, encrypt
 from termcolor import colored
-import logging
 import traceback
 import pyperclip
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify
+import webview
+
+server = Flask(__name__, static_folder='static', template_folder='templates')
 
 VERSION = 1.2
 
@@ -23,10 +26,6 @@ if not os.path.exists(DATA_FOLDER):
 SAVE_FOLDER = os.path.join(os.getenv("USERPROFILE"), "AppData", "LocalLow", "ZeekerssRBLX", "Lethal Company")
 SAVE = None
 ORIGINAL_SAVE = None
-# logging
-logging.basicConfig(filename=os.path.join(DATA_FOLDER, "log.txt"), level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
-logger = logging.getLogger(__name__)
 
 RESET = {'CurrentPlanetID': {'__type': 'int', 'value': 0},
          'DeadlineTime': {'__type': 'int', 'value': 3240},
@@ -82,26 +81,23 @@ def check_for_updates():
     try:
         r = requests.get("https://raw.githubusercontent.com/BEMZ01/LethalCompanySaveEditor/master/main.py")
         if r.status_code != 200:
-            logger.error("Error checking for updates. Status code not okay.")
+            print("Error checking for updates. Status code not okay.")
             return False
         online_version = float(r.text.split('\n')[14].split(' = ')[1])
         local_version = float(VERSION)
-        logger.info(f"Found version {online_version} online.")
-        logger.info(f"Found version {local_version} locally.")
+        print(f"Found version {online_version} online.")
+        print(f"Found version {local_version} locally.")
         if online_version > local_version:
-            logger.warning("Update available!")
-            print("Update available! Download at https://github.com/BEMZ01/LethalCompanySaveEditor/releases/latest")
+            print("Update available!")
             return True
         elif online_version == local_version:
-            logger.info("No updates available.")
             print("No updates available.")
             return False
         elif online_version < local_version:
-            logger.warning("You are running a newer version than the latest release.")
             print("You are running a newer version than the latest release.")
             return False
     except requests.exceptions.ConnectionError:
-        logger.error(f"Error checking for updates.\n{traceback.format_exc()}")
+        print(f"Error checking for updates.\n{traceback.format_exc()}")
         return False
 
 
@@ -114,8 +110,7 @@ def process_value(value: dict):
     :param value: The dictionary to process
     :return: The processed value"""
     if "__type" not in value.keys():
-        logger.error(f"Invalid value: missing __type key.\n{traceback.format_exc()}")
-        print("Invalid value: missing __type key.")
+        print(f"Invalid value: missing __type key.\n{traceback.format_exc()}")
         return None
     if value["__type"] == 'int':
         return int(value['value'])
@@ -132,8 +127,7 @@ def process_value(value: dict):
     elif value["__type"] == 'UnityEngine.Vector3[],UnityEngine.CoreModule':
         return str(value['value'])
     else:
-        logger.error(f"Invalid value: unknown __type {value['__type']}.\n{traceback.format_exc()}")
-        print(f"Invalid value: unknown __type {value['__type']}.")
+        print(f"Invalid value: unknown __type {value['__type']}.\n{traceback.format_exc()}")
         return None
 
 
@@ -178,8 +172,7 @@ def edit_save():
                 edit = False
                 break
             elif key not in SAVE.keys():
-                logger.error(f"Invalid key: {key}.\n{traceback.format_exc()}")
-                print("Invalid key.")
+                print(f"Invalid key: {key}.\n{traceback.format_exc()}")
                 continue
             break
         while edit:
@@ -197,17 +190,14 @@ def edit_save():
                 try:
                     value = dict(demjson3.decode(value))
                 except demjson3.JSONDecodeError:
-                    logger.error(f"Invalid value. (Didn't match Vector3 format)\n{traceback.format_exc()}")
-                    print("Invalid value. (Didn't match Vector3 format)")
+                    print(f"Invalid value. (Didn't match Vector3 format)\n{traceback.format_exc()}")
                     continue
             elif expected_type == "System.Int32[],mscorlib":
                 # System.Int32[],mscorlib is stored as [1,2,3,4,5] string
                 try:
                     value = demjson3.decode(value)
                 except demjson3.JSONDecodeError:
-                    logger.error(
-                        f"Invalid value. (Didn't match System.Int32[],mscorlib format)\n{traceback.format_exc()}")
-                    print("Invalid value. (Didn't match System.Int32[],mscorlib format)")
+                    print(f"Invalid value. (Didn't match System.Int32[],mscorlib format)\n{traceback.format_exc()}")
                     continue
             elif expected_type == "UnityEngine.Vector3[],UnityEngine.CoreModule":
                 try:
@@ -337,10 +327,18 @@ def add_keys():
                 print("Invalid option.")
 
 
+@server.route('/')
+def index():
+    saves = [{"id": 1, "name": "test"}, {"id": 2, "name": "test2"}]
+    return render_template('index.html', saves=saves)
+
+
 if __name__ == "__main__":
-    logger.debug("Starting program...")
+    webview.create_window('Flask example', server)
+    webview.start()
+    raise SystemExit
     # check for flags
-    logger.debug(f"Flags: {sys.argv}")
+    print(f"Flags: {sys.argv}")
     if "-h" in sys.argv or "--help" in sys.argv:
         print("Usage: python main.py [-p password] [-sf save_folder_path]")
         exit(0)
@@ -398,10 +396,8 @@ if __name__ == "__main__":
         input("Error decrypting save file. SAVE is None. Press enter to continue...")
         exit(1)
     if "LastVerPlayed" not in SAVE.keys() and "FileGameVers" not in SAVE.keys():
-        logger.warning("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal"
-                       " Company save.")
-        input("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal Company"
-              " save.\nPress enter to continue...")
+        print("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal"
+              " Company save.")
     print(f"Save file {save_file} decrypted and loaded successfully! ({len(SAVE.keys())} keys)")
     while True:
         input("Press enter to continue...")
@@ -491,10 +487,8 @@ if __name__ == "__main__":
                 print("Error decoding save file.")
                 continue
             if "LastVerPlayed" not in SAVE.keys() and "FileGameVers" not in SAVE.keys():
-                logger.warning("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be"
-                               " a Lethal Company save.")
-                input("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal"
-                      " Company save.\nPress enter to continue...")
+                print("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be"
+                      " a Lethal Company save.")
             print(f"Save loaded successfully! ({len(SAVE.keys())} keys)")
         elif menu == "9":
             # override save file with text
@@ -511,10 +505,8 @@ if __name__ == "__main__":
                 print("Error decoding save file.")
                 continue
             if "LastVerPlayed" not in SAVE.keys() and "FileGameVers" not in SAVE.keys():
-                logger.warning("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be"
-                               " a Lethal Company save.")
-                input("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal"
-                      " Company save.\nPress enter to continue...")
+                print("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal"
+                      " Company save.")
             print(f"Save loaded successfully! ({len(SAVE.keys())} keys)")
         elif menu == "s":
             break

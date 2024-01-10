@@ -1,0 +1,11 @@
+<HTML>
+<HEAD>
+<TITLE>Index</TITLE>
+</HEAD>
+<BODY>
+<H1>Index</H1>
+{% for save in saves %}
+    <A HREF="/save/{{ save.id }}">{{ save.name }}</A><BR>
+{% endfor %}
+</BODY>
+</HTML>

@@ -23,13 +23,13 @@ When you first run LethalCompanySaveEditor, Windows Defender SmartScreen might d
 - Some way to easily define Vector3 coordinates
 
 ## Usage
-0. **Create a virtual environment (Suggested)**
-1. **Install the required libraries:**
+1. **Create a virtual environment (Suggested)**
+2. **Install the required libraries:**
 
    ```bash
    pip install -r "requirements.txt"
    ```
-2. **Run the program:**
+3. **Run the program:**
    ```bash
    python main.py [-p decryption_password] [-sf save_folder]
    ```
