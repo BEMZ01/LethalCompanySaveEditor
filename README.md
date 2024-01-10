@@ -1,7 +1,9 @@
-# LethalCompanySaveEditor
+# LethalCompanySaveEditor GUI
 
 **A simple save editor for Lethal Company, written in Python 3.11 for python versions higher than 3.10**
-This should work for any project that utilizes ES3 Saves with encryption, you'll need the save location and the decryption password
+This should work for any project that utilizes ES3 Saves with encryption, you'll need the save location and the decryption password for the game you wish to edit.
+
+This is the **GUI** version. If you're looking for the CLI version, you can find it [**here**](https://github.com/BEMZ01/LethalCompanySaveEditor/tree/master).
 
 ## How to Download
 
