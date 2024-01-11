@@ -2,7 +2,8 @@ name: Build Workflow
 
 on:
   push:
-#    branches: master
+    branches:
+      - master
 
 jobs:
   build-windows:
@@ -33,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: autobuild-${{ github.event.head_commit.id }}
-          release_name: Release at ${{ github.event.head_commit.timestamp }}
+          release_name: (CLI) Release at ${{ github.event.head_commit.timestamp }}
           body: |
             Release for ${{ github.event.head_commit.message }}
             Committed at ${{ github.event.head_commit.timestamp }} by ${{ github.event.head_commit.author.name }}
