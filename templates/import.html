@@ -22,7 +22,7 @@
         <h1 class="text-center">Import save from text</h1>
         <h2 class="text-center text-secondary">Paste the code into the textbox below.</h2>
         <div>
-            <form><textarea class="form-control" id="autoresizing"></textarea><button class="btn btn-primary" type="submit" style="margin-top: 5px;">Confirm</button><a class="btn btn-primary" role="button" style="margin: 4px 0px 0px;margin-top: 5px;margin-left: 5px;" onclick="copytext()" href="{{ url_for('save', save_id=save_id) }}">Cancel</a></form>
+            <form method="post"><textarea style="height:auto" name="textarea" class="form-control" id="autoresizing"></textarea><button class="btn btn-primary" type="submit" style="margin-top: 5px;">Confirm</button><a class="btn btn-primary" role="button" style="margin: 4px 0px 0px;margin-top: 5px;margin-left: 5px;" href="{{ url_for('save', save_id=save['id']) }}">Cancel</a></form>
         </div>
     </div>
     <footer class="text-center py-4">

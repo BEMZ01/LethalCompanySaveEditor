@@ -22,7 +22,7 @@
         <h1 class="text-center">View raw text</h1>
         <h2 class="text-center text-secondary">Below is the raw exported save in plaintext.</h2>
         <h6 class="text-center text-secondary">Hint: You can import this text by using the import feature!</h6>
-        <div><textarea id="autoresizing">{{ save }} </textarea></div><button class="btn btn-primary" type="button" style="margin-top: 5px;" onclick="copytext()">Copy to clipboard</button><a class="btn btn-primary" role="button" style="margin: 4px 0px 0px;margin-top: 5px;margin-left: 5px;" onclick="copytext()" href="{{ url_for('save', save_id=save['id']) }}">Back</a>
+        <div><textarea style="height:auto"class="form-control" id="autoresizing">{{ save["data"] }} </textarea></div><button class="btn btn-primary" type="button" style="margin-top: 5px;" onclick="copytext()">Copy to clipboard</button><a class="btn btn-primary" role="button" style="margin: 4px 0px 0px;margin-top: 5px;margin-left: 5px;" onclick="copytext()" href="{{ url_for('save', save_id=save['id']) }}">Back</a>
     </div>
     <footer class="text-center py-4">
         <div class="container">

@@ -18,6 +18,26 @@
             </div>
         </div>
     </nav>
+    {% if error %}
+    <div class="container text-center py-4 py-xl-5">
+        <div class="card">
+            <div class="card-body" style="background: var(--bs-danger);">
+                <h4 class="card-title">There was an error doing that. You have been returned to the main menu.</h4>
+                <p class="card-text">Description: {{error}}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if success %}
+        <div class="container text-center py-4 py-xl-5">
+        <div class="card">
+            <div class="card-body" style="background: var(--bs-success);">
+                <h4 class="card-title">Success!</h4>
+                <p class="card-text">{{success}}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="container py-4 py-xl-5">
         <h1 class="text-center">Your save in numbers</h1>
         <div class="row gy-4 row-cols-2 row-cols-md-4">
@@ -90,7 +110,7 @@
         </div>
     </div>
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center align-items-center">
             <div class="col-md-3" style="margin-top: 5px;">
                 <div class="card">
                     <div class="card-body">
@@ -102,7 +122,15 @@
             <div class="col-md-3" style="margin-top: 5px;">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Load save from text</h4>
+                        <h4 class="card-title">Export save to text</h4>
+                        <h6 class="text-muted card-subtitle mb-2">Use this to send the save to someone!</h6><a class="btn btn-primary" role="button" href="{{ url_for('save_export', save_id=save['id']) }}"><i class="far fa-arrow-alt-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" style="margin-top: 5px;">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Import save from text</h4>
                         <h6 class="text-muted card-subtitle mb-2">This will over-write this save</h6><a class="btn btn-primary" role="button" href="{{ url_for('save_load', save_id=save['id']) }}"><i class="far fa-arrow-alt-circle-right"></i></a>
                     </div>
                 </div>

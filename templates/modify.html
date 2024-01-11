@@ -18,8 +18,8 @@
         </div>
     </nav>
     <div class="container py-4 py-xl-5">
-        <h1 class="text-center">Modify a key pair</h1>
-        <h2 class="text-center text-secondary">Select a key from below to edit.</h2>
+        <h1 class="text-center">Modify keys</h1>
+        <h2 class="text-center text-secondary">Use the table below to edit the save.</h2>
         <div>
             <form method="post">
                 <div class="table-responsive text-start">
@@ -32,11 +32,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for key in save['data'] %}
+                        {% for i in range(0, save['data']|length) %}
+                            {% set key = save['data'][save['keys'][i]] %}
                             <tr>
-                                <td><input class="form-control" type="text" value="{{ key['name'] }}" style="width: 100%;" autocomplete="off"></td>
-                                <td><input class="form-control" type="text" value="{{ key['value']['value ']}}" style="width: 100%;" autocomplete="off"></td>
-                                <td>{{ key['value']['type'] }}</td>
+                                <td><input name="{{save['keys'][i]}}" class="form-control" type="text" value="{{ save['keys'][i] }}" style="width: 100%;" autocomplete="off"></td>
+                                <td><input class="form-control" type="text" value="{{ key['value']}}" style="width: 100%;" autocomplete="off"></td>
+                                <td>{{ key['__type'] }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
