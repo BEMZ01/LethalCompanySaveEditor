@@ -200,7 +200,7 @@ def save_raw(save_id):
     return jsonify(SAVE)
 
 
-@server.route('/save/<int:save_id>/load', methods=['POST', 'GET']
+@server.route('/save/<int:save_id>/load', methods=['POST', 'GET'])
 def save_load(save_id):
     global SAVE
     global ORIGINAL_SAVE
