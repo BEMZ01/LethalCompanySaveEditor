@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>LethalCompanySaveEditorGUI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.min.css') }}">
+</head>
+
+<body>
+    <nav class="navbar navbar-light navbar-expand-md py-3">
+        <div class="container"><a class="navbar-brand d-flex align-items-center" href="#"><span>LCSE - Editing {{save['name']}}</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <div class="ms-auto"><a class="btn btn-danger ms-auto" role="button" style="margin-right: 5px;" href="{{ url_for('save_close', save_id=save['id']) }}">Close</a><a class="btn btn-warning ms-auto" role="button" style="margin-right: 20px;" href="{{ url_for('save_restore', save_id=save['id']) }}">Restore</a><a class="btn btn-success ms-auto" role="button" href="{{ url_for('save_save', save_id=save['id']) }}">Save</a></div>
+            </div>
+        </div>
+    </nav>
+    <div class="container py-4 py-xl-5">
+        <h1 class="text-center">Your save in numbers</h1>
+        <div class="row gy-4 row-cols-2 row-cols-md-4">
+            {% if save["stats"]["daysspent"] is not none %}
+            <div class="col">
+                <div class="text-center d-flex flex-column justify-content-center align-items-center py-3">
+                    <div class="bs-icon-xl bs-icon-circle bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-2 bs-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-watch">
+                            <path d="M8.5 5a.5.5 0 0 0-1 0v2.5H6a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V5z"></path>
+                            <path d="M5.667 16C4.747 16 4 15.254 4 14.333v-1.86A5.985 5.985 0 0 1 2 8c0-1.777.772-3.374 2-4.472V1.667C4 .747 4.746 0 5.667 0h4.666C11.253 0 12 .746 12 1.667v1.86a5.99 5.99 0 0 1 1.918 3.48.502.502 0 0 1 .582.493v1a.5.5 0 0 1-.582.493A5.99 5.99 0 0 1 12 12.473v1.86c0 .92-.746 1.667-1.667 1.667H5.667zM13 8A5 5 0 1 0 3 8a5 5 0 0 0 10 0z"></path>
+                        </svg></div>
+                    <div class="px-3">
+                        <h2 class="fw-bold mb-0">&nbsp;{{save["stats"]["daysspent"]}}</h2>
+                        <p class="mb-0">Days spent on planets</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if save["stats"]["deaths"] is not none %}
+            <div class="col">
+                <div class="text-center d-flex flex-column justify-content-center align-items-center py-3">
+                    <div class="bs-icon-xl bs-icon-circle bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-2 bs-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
+                            <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                            <path d="M416 400V464C416 490.5 394.5 512 368 512H320V464C320 455.2 312.8 448 304 448C295.2 448 288 455.2 288 464V512H224V464C224 455.2 216.8 448 208 448C199.2 448 192 455.2 192 464V512H144C117.5 512 96 490.5 96 464V400C96 399.6 96 399.3 96.01 398.9C37.48 357.8 0 294.7 0 224C0 100.3 114.6 0 256 0C397.4 0 512 100.3 512 224C512 294.7 474.5 357.8 415.1 398.9C415.1 399.3 416 399.6 416 400V400zM160 192C124.7 192 96 220.7 96 256C96 291.3 124.7 320 160 320C195.3 320 224 291.3 224 256C224 220.7 195.3 192 160 192zM352 320C387.3 320 416 291.3 416 256C416 220.7 387.3 192 352 192C316.7 192 288 220.7 288 256C288 291.3 316.7 320 352 320z"></path>
+                        </svg></div>
+                    <div class="px-3">
+                        <h2 class="fw-bold mb-0">{{save["stats"]["deaths"]}}</h2>
+                        <p class="mb-0">Deaths</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if save["stats"]["stepstaken"] is not none %}
+            <div class="col">
+                <div class="text-center d-flex flex-column justify-content-center align-items-center py-3">
+                    <div class="bs-icon-xl bs-icon-circle bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-2 bs-icon"><i class="fas fa-shoe-prints"></i></div>
+                    <div class="px-3">
+                        <h2 class="fw-bold mb-0">{{save["stats"]["stepstaken"]}}</h2>
+                        <p class="mb-0">Steps Taken</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if save["stats"]["valuecollected"] is not none %}
+            <div class="col">
+                <div class="text-center d-flex flex-column justify-content-center align-items-center py-3">
+                    <div class="bs-icon-xl bs-icon-circle bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-2 bs-icon"><i class="fas fa-coins"></i></div>
+                    <div class="px-3">
+                        <h2 class="fw-bold mb-0">{{save["stats"]["valuecollected"]}}</h2>
+                        <p class="mb-0">Total Value</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row gy-4 row-cols-2 row-cols-md-4 justify-content-center">
+            {% if save["stats"]["keys"] is not none %}
+            <div class="col">
+                <div class="text-center d-flex flex-column justify-content-center align-items-center py-3">
+                    <div class="bs-icon-xl bs-icon-circle bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-2 bs-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
+                            <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                            <path d="M282.3 343.7L248.1 376.1C244.5 381.5 238.4 384 232 384H192V424C192 437.3 181.3 448 168 448H128V488C128 501.3 117.3 512 104 512H24C10.75 512 0 501.3 0 488V408C0 401.6 2.529 395.5 7.029 391L168.3 229.7C162.9 212.8 160 194.7 160 176C160 78.8 238.8 0 336 0C433.2 0 512 78.8 512 176C512 273.2 433.2 352 336 352C317.3 352 299.2 349.1 282.3 343.7zM376 176C398.1 176 416 158.1 416 136C416 113.9 398.1 96 376 96C353.9 96 336 113.9 336 136C336 158.1 353.9 176 376 176z"></path>
+                        </svg></div>
+                    <div class="px-3">
+                        <h2 class="fw-bold mb-0">{{save["stats"]["keys"]}}</h2>
+                        <p class="mb-0">Keys</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3" style="margin-top: 5px;">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Edit raw save data</h4>
+                        <h6 class="text-muted card-subtitle mb-2">This can lead to loss of data!</h6><a class="btn btn-primary" role="button" href="{{ url_for('save_raw', save_id=save['id']) }}"><i class="far fa-arrow-alt-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" style="margin-top: 5px;">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Load save from text</h4>
+                        <h6 class="text-muted card-subtitle mb-2">This will over-write this save</h6><a class="btn btn-primary" role="button" href="{{ url_for('save_load', save_id=save['id']) }}"><i class="far fa-arrow-alt-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" style="margin-top: 5px;">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Insert key</h4>
+                        <h6 class="text-muted card-subtitle mb-2">Insert a key and value pair into the save</h6><a class="btn btn-primary" role="button" href="{{ url_for('save_insert', save_id=save['id']) }}"><i class="far fa-arrow-alt-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" style="margin-top: 5px;">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Edit pre-existing key</h4>
+                        <h6 class="text-muted card-subtitle mb-2">Edit a key and value from the save</h6><a class="btn btn-primary" role="button" href="{{ url_for('save_modify', save_id=save['id']) }}"><i class="far fa-arrow-alt-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="text-center py-4">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-lg-3 justify-content-center">
+                <div class="col">
+                    <p class="text-muted my-2">Made with ❤️ by BEMZlabs</p>
+                    <div class="row">
+                        <div class="col"><a href="https://github.com/BEMZ01/LethalCompanySaveEditor" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 0 512 512" width="1em" height="1em" fill="currentColor" class="fs-2" style="margin-right: 5px;">
+                                    <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                    <path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path>
+                                </svg></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.min.js') }}"></script>
+</body>
+
+</html>

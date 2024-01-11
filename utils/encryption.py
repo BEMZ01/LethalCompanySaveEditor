@@ -4,25 +4,23 @@ import hashlib
 from Crypto.Cipher import AES
 import os
 import demjson3
-import logging
-log = logging.getLogger(__name__)
 
 
 def pad(data, block_size):
-    log.debug(f'Padding data: {data}')
+    print(f'Padding data: {data}')
     padding_length = block_size - len(data) % block_size
     padding = bytes([padding_length] * padding_length)
     return data.encode() + padding
 
 
 def dump(file, data):
-    log.debug(f'Dumping data to file: {file}')
+    print(f'Dumping data to file: {file}')
     with open(file, 'w') as f:
         f.write(str(data).replace('\'', '"').replace('True', 'true').replace('False', 'false'))
 
 
 def encrypt(file, data, password) -> bool:
-    log.debug(f'Encrypting file: {file}, data: {data}, password: {password}')
+    print(f'Encrypting file: {file}, data: {data}, password: {password}')
     with open(file, 'rb') as f_og:
         with open(file + '.bak', 'wb') as f:
             f.write(f_og.read())
@@ -30,7 +28,7 @@ def encrypt(file, data, password) -> bool:
     data = str(data).replace('\'', '"').replace('True', 'true').replace('False', 'false')
 
     iv = os.urandom(16)
-    log.debug(f'IV: {iv}')
+    print(f'IV: {iv}')
 
     key = hashlib.pbkdf2_hmac('sha1', bytes(password, 'utf-8'), iv, 100, 16)
     cipher = AES.new(key, AES.MODE_CBC, iv)
@@ -41,20 +39,20 @@ def encrypt(file, data, password) -> bool:
         with open(file, 'wb') as f:
             f.write(encrypted_data)
     except Exception as e:
-        log.error(f'Error encrypting file. Restoring backup...\nError: {e.with_traceback(e.__traceback__)}')
         print(f'Error encrypting file. Restoring backup...\nError: {e.with_traceback(e.__traceback__)}')
         with open(file + '.bak', 'rb') as f_og:
             with open(file, 'wb') as f:
                 f.write(f_og.read())
         return False
+    return True
 
 
 def decrypt(file, password) -> dict | None:
-    log.debug(f'Decrypting file: {file}, password: {password}')
+    print(f'Decrypting file: {file}, password: {password}')
     with open(file, 'rb') as f:
         data = f.read()
     iv = data[:16]
-    log.debug(f'IV: {iv}')
+    print(f'IV: {iv}')
 
     key = hashlib.pbkdf2_hmac('sha1', bytes(password, 'utf-8'), iv, 100, 16)
     cipher = AES.new(key, AES.MODE_CBC, iv)
@@ -62,8 +60,7 @@ def decrypt(file, password) -> dict | None:
     try:
         decrypted_data = cipher.decrypt(data[16:]).decode()
     except Exception as e:
-        log.error(f'Error decrypting file. Wrong password? Password {password}\nError: {e.with_traceback(e.__traceback__)}')
-        print(f'Error decrypting file. Wrong password?\nError: {e.with_traceback(e.__traceback__)}')
+        print(f'Error decrypting file. Wrong password? Password {password}\nError: {e.with_traceback(e.__traceback__)}')
         return None
 
     while decrypted_data[-1] != '}':

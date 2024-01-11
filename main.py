@@ -81,315 +81,159 @@ def check_for_updates():
     try:
         r = requests.get("https://raw.githubusercontent.com/BEMZ01/LethalCompanySaveEditor/master/main.py")
         if r.status_code != 200:
-            print("Error checking for updates. Status code not okay.")
+            print("UPDATE: Error checking for updates. Status code not okay.")
             return False
         online_version = float(r.text.split('\n')[14].split(' = ')[1])
         local_version = float(VERSION)
-        print(f"Found version {online_version} online.")
-        print(f"Found version {local_version} locally.")
         if online_version > local_version:
-            print("Update available!")
-            return True
+            print("UPDATE: Update available!")
+            return online_version
         elif online_version == local_version:
-            print("No updates available.")
+            print("UPDATE: No updates available.")
             return False
         elif online_version < local_version:
-            print("You are running a newer version than the latest release.")
+            print("UPDATE: You are running a newer version than the latest release.")
             return False
     except requests.exceptions.ConnectionError:
-        print(f"Error checking for updates.\n{traceback.format_exc()}")
+        print(f"UPDATE: Error checking for updates.\n{traceback.format_exc()}")
         return False
-
-
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-
-def process_value(value: dict):
-    """Processes a value from the save file and returns it in a readable format.
-    :param value: The dictionary to process
-    :return: The processed value"""
-    if "__type" not in value.keys():
-        print(f"Invalid value: missing __type key.\n{traceback.format_exc()}")
-        return None
-    if value["__type"] == 'int':
-        return int(value['value'])
-    elif value["__type"] == 'bool':
-        return bool(value['value'])
-    elif value["__type"] == 'string':
-        return str(value['value'])
-    elif value["__type"] == 'float':
-        return float(value['value'])
-    elif value["__type"] == 'Vector3':
-        return str(value['value'])
-    elif value["__type"] == 'System.Int32[],mscorlib':
-        return str(value['value'])
-    elif value["__type"] == 'UnityEngine.Vector3[],UnityEngine.CoreModule':
-        return str(value['value'])
-    else:
-        print(f"Invalid value: unknown __type {value['__type']}.\n{traceback.format_exc()}")
-        return None
-
-
-def display_save(display_index: bool = False) -> bool:
-    """Displays the save file in a pretty format. Green values have been modified.
-    :param display_index: Whether to display the index of each key before the key name. Default: False
-    :return: True if successful, False otherwise"""
-    if not display_index:
-        for k, v in SAVE.items():
-            if process_value(v) is not None:
-                print(colored(k, "green" if k not in ORIGINAL_SAVE.keys() else "blue"), end="")
-                print(colored(": ", "white"), end="")
-                print(colored(process_value(v),
-                              "green" if k not in ORIGINAL_SAVE.keys() or v["value"] != ORIGINAL_SAVE[k][
-                                  "value"] else "blue"))
-    else:
-        for i, (k, v) in enumerate(SAVE.items()):
-            # if key type is not recognized
-            if process_value(v) is not None:
-                if v["value"] != ORIGINAL_SAVE[k]["value"]:
-                    print(colored(f"{i}: ", "white"), end="")
-                    print(colored(k, "blue"), end="")
-                    print(colored(": ", "white"), end="")
-                    print(colored(process_value(v), "green"), end="")
-                    print(colored(f" ({process_value(ORIGINAL_SAVE[k])})", "white"))
-                else:
-                    print(colored(f"{i}: ", "white"), end="")
-                    print(colored(k, "blue"), end="")
-                    print(colored(": ", "white"), end="")
-                    print(colored(process_value(v), "white"))
-    return True
-
-
-def edit_save():
-    edits = 0
-    edit = True
-    while True:
-        while True:
-            display_save()
-            key = input("Enter the key to edit: ")
-            if key == "":
-                edit = False
-                break
-            elif key not in SAVE.keys():
-                print(f"Invalid key: {key}.\n{traceback.format_exc()}")
-                continue
-            break
-        while edit:
-            value = input(f"Original type is {SAVE[key]['__type']}\nEnter the new value: ")
-            expected_type = SAVE[key]["__type"]
-            if (value.lower() == "true" or value.lower() == "t") and expected_type == "bool":
-                value = True
-            elif (value.lower() == "false" or value.lower() == "f") and expected_type == "bool":
-                value = False
-            elif value.isnumeric() and expected_type == "int":
-                value = int(value)
-            elif value.replace(".", "", 1).isnumeric() and expected_type == "float":
-                value = float(value)
-            elif expected_type == "Vector3":
-                try:
-                    value = dict(demjson3.decode(value))
-                except demjson3.JSONDecodeError:
-                    print(f"Invalid value. (Didn't match Vector3 format)\n{traceback.format_exc()}")
-                    continue
-            elif expected_type == "System.Int32[],mscorlib":
-                # System.Int32[],mscorlib is stored as [1,2,3,4,5] string
-                try:
-                    value = demjson3.decode(value)
-                except demjson3.JSONDecodeError:
-                    print(f"Invalid value. (Didn't match System.Int32[],mscorlib format)\n{traceback.format_exc()}")
-                    continue
-            elif expected_type == "UnityEngine.Vector3[],UnityEngine.CoreModule":
-                try:
-                    value = demjson3.decode(value)
-                except demjson3.JSONDecodeError:
-                    print("Invalid value. (Didn't match UnityEngine.Vector3[],UnityEngine.CoreModule format)")
-                    continue
-            else:
-                value = str(value)
-            break
-        if edit:
-            clear_screen()
-            edits += 1
-            SAVE[key]["value"] = value
-            print("Value updated.")
-        # ask if user wants to continue editing
-        while True:
-            cont = input(f"You've made {edits} edits.\nContinue editing? (Y/N): ").upper()
-            if cont == "Y":
-                break
-            elif cont == "N":
-                return True
-            else:
-                print("Invalid option.")
-        clear_screen()
-
-
-def add_keys():
-    # add keys to the save file
-    global SAVE
-    while True:
-        while True:
-            display_save()
-            key = input("Enter the key to add: ")
-            if key == "":
-                return True
-            elif key in SAVE.keys():
-                print("Key already exists.")
-                continue
-            break
-        while True:
-            type = input("Enter the type of the key: ")
-            if type == "":
-                return True
-            elif type == "int":
-                while True:
-                    try:
-                        value = int(input("Enter the value of the key: "))
-                        break
-                    except ValueError or TypeError as e:
-                        print("Invalid value.")
-                        continue
-
-            elif type == "bool":
-                while True:
-                    try:
-                        value = True if input("Enter the value of the key: ").lower() == "true" else False
-                        break
-                    except ValueError or TypeError as e:
-                        print("Invalid value.")
-                        continue
-
-            elif type == "string":
-                while True:
-                    try:
-                        value = str(input("Enter the value of the key: "))
-                        break
-                    except ValueError or TypeError as e:
-                        print("Invalid value.")
-                        continue
-
-            elif type == "float":
-                while True:
-                    try:
-                        value = float(input("Enter the value of the key: "))
-                        break
-                    except ValueError or TypeError as e:
-                        print("Invalid value.")
-                        continue
-
-            elif type == "Vector3":
-                value = str(input("Enter the value of the key: "))
-                while True:
-                    try:
-                        value = dict(demjson3.decode(value))
-                        break
-                    except demjson3.JSONDecodeError as e:
-                        print("Invalid value. (Didn't match Vector3 format)")
-                        continue
-
-                break
-            elif type == "System.Int32[],mscorlib":
-                value = str(input("Enter the value of the key: "))
-                while True:
-                    try:
-                        value = demjson3.decode(value)
-                        break
-                    except demjson3.JSONDecodeError as e:
-                        print("Invalid value. (Didn't match System.Int32[],mscorlib format)")
-                        continue
-                break
-            elif type == "UnityEngine.Vector3[],UnityEngine.CoreModule":
-                value = str(input("Enter the value of the key: "))
-                while True:
-                    try:
-                        value = demjson3.decode(value)
-                        break
-                    except demjson3.JSONDecodeError as e:
-                        print("Invalid value. (Didn't match UnityEngine.Vector3[],UnityEngine.CoreModule format)")
-                        continue
-                break
-            else:
-                print("Invalid type.")
-                continue
-            break
-        SAVE[key] = {"__type": type, "value": value}
-        print(f"{key} = {SAVE[key]}")
-        print("Key added.")
-        # ask if user wants to continue adding keys
-        while True:
-            cont = input("Continue adding keys? (Y/N): ").upper()
-            if cont == "Y":
-                break
-            elif cont == "N":
-                return True
-            else:
-                print("Invalid option.")
 
 
 @server.route('/')
 def index():
-    saves = [{"id": 1, "name": "test"}, {"id": 2, "name": "test2"}]
-    return render_template('index.html', saves=saves)
+    global SAVE, ORIGINAL_SAVE
+    error = request.args.get('error', None)
+    success = request.args.get('success', None)
+    SAVE = None
+    ORIGINAL_SAVE = None
+    save_files = [f for f in os.listdir(SAVE_FOLDER) if
+                  os.path.isfile(os.path.join(SAVE_FOLDER, f)) and f.startswith("LC")]
+    saves = [{"id": i, "filename": f} for i, f in enumerate(save_files)]
+    return render_template('index.html', saves=saves, error=error, success=success,
+                           update_available=check_for_updates() is not False)
+
+
+@server.route('/save/<int:save_id>')
+def save(save_id):
+    global SAVE
+    global ORIGINAL_SAVE
+    save_files = [f for f in os.listdir(SAVE_FOLDER) if
+                  os.path.isfile(os.path.join(SAVE_FOLDER, f)) and f.startswith("LC")]
+    SAVE = decrypt(os.path.join(SAVE_FOLDER, save_files[save_id]), PASSWORD)
+    ORIGINAL_SAVE = copy.deepcopy(SAVE)
+    save_data = {
+        "id": save_id,
+        "name": save_files[save_id],
+        "stats": {
+            "keys": len(SAVE.keys())}
+    }
+    try:
+        save_data["stats"]["daysspent"] = SAVE["Stats_DaysSpent"]["value"]
+        save_data["stats"]["deaths"] = SAVE["Stats_Deaths"]["value"]
+        save_data["stats"]["stepstaken"] = SAVE["Stats_StepsTaken"]["value"]
+        save_data["stats"]["valuecollected"] = SAVE["Stats_ValueCollected"]["value"]
+    except KeyError as e:
+        print(f"Error getting stats.\n{traceback.format_exc()}")
+        save_data["stats"]["daysspent"] = None
+        save_data["stats"]["deaths"] = None
+        save_data["stats"]["stepstaken"] = None
+        save_data["stats"]["valuecollected"] = None
+    return render_template('editor.html', save=save_data)
+
+
+@server.route('/save/<int:save_id>/close')
+def save_close(save_id):
+    global SAVE
+    SAVE = None
+    return redirect(url_for('index', success="Save file closed successfully!"))
+
+
+@server.route('/save/<int:save_id>/restore')
+def save_restore(save_id):
+    global SAVE
+    global ORIGINAL_SAVE
+    SAVE = copy.deepcopy(ORIGINAL_SAVE)
+    return redirect(url_for('index', success="Save file restored successfully!"))
+
+
+def save_id_valid(save_id, bypass_none_check=False):
+    """
+    Checks if a save ID is valid.
+    :param bypass_none_check: Whether to bypass the check for if the save file is decrypted
+    :param save_id: The save ID to check
+    :return: None if valid, error message if invalid
+    """
+    global SAVE
+    save_files = get_save_files()
+    if save_id >= len(save_files) or save_id < 0:
+        return "Invalid save file ID."
+    if SAVE is None and not bypass_none_check:
+        return "Error decrypting save file."
+    if "LastVerPlayed" not in SAVE.keys() and "FileGameVers" not in SAVE.keys():
+        return ("Error loading save file. FileGameVers and LastVerPlayed key not found. This may not be a Lethal "
+                "Company save.")
+    return None
+
+
+@server.route('/save/<int:save_id>/save')
+def save_save(save_id):
+    global SAVE
+    global ORIGINAL_SAVE
+    if save_id_valid(save_id) is not None:
+        return redirect(url_for('index', error=save_id_valid(save_id)))
+    save_files = get_save_files()
+    save_file_path = os.path.join(SAVE_FOLDER, save_files[save_id])
+    if not encrypt(save_file_path, SAVE, PASSWORD):
+        return redirect(url_for('index', error="Error encrypting save file."))
+    return redirect(url_for('index', success="Save file saved successfully!"))
+
+
+def get_save_files():
+    return [f for f in os.listdir(SAVE_FOLDER) if os.path.isfile(os.path.join(SAVE_FOLDER, f)) and f.startswith("LC")]
+
+
+@server.route('/save/<int:save_id>/raw')
+def save_raw(save_id):
+    global SAVE
+    if save_id_valid(save_id) is not None:
+        return redirect(url_for('index', error=save_id_valid(save_id)))
+    return jsonify(SAVE)
+
+
+@server.route('/save/<int:save_id>/load', methods=['POST', 'GET']
+def save_load(save_id):
+    global SAVE
+    global ORIGINAL_SAVE
+    if save_id_valid(save_id) is not None:
+        return redirect(url_for('index', error=save_id_valid(save_id)))
+    if request.method == 'POST':
+        ...
+        return redirect(url_for('save', save_id=save_id, success="Save file loaded successfully!"))
+    else:
+        return render_template('load.html')
+
+
+@server.route('/save/<int:save_id>/insert')
+def save_insert(save_id):
+    print("Not implemented yet")
+    return redirect(url_for('index', error="Not implemented yet"))
+
+
+@server.route('/save/<int:save_id>/modify')
+def save_modify(save_id):
+    print("Not implemented yet")
+    return redirect(url_for('index', error="Not implemented yet"))
 
 
 if __name__ == "__main__":
-    webview.create_window('Flask example', server)
-    webview.start()
-    raise SystemExit
-    # check for flags
     print(f"Flags: {sys.argv}")
-    if "-h" in sys.argv or "--help" in sys.argv:
-        print("Usage: python main.py [-p password] [-sf save_folder_path]")
-        exit(0)
-    if "-p" in sys.argv:
-        try:
-            PASSWORD = str(sys.argv[sys.argv.index("-p") + 1])
-        except IndexError or ValueError as e:
-            print("Invalid password.")
-            exit(1)
-    elif "-sf" in sys.argv:
-        # save folder path flag
-        try:
-            SAVE_FOLDER = str(sys.argv[sys.argv.index("-sf") + 1])
-        except IndexError or ValueError as e:
-            print("Invalid save folder path.")
-            exit(1)
-    # check for updates
-    check_for_updates()
-    # check if save folder exists
-    if not os.path.exists(SAVE_FOLDER):
-        input("Save folder does not exist. Press enter to exit...")
-        exit(1)
-    # save files are located at %userprofile%\AppData\LocalLow\ZeekerssRBLX\Lethal Company
-    # list all files starting with "LC" in the directory
-    try:
-        save_files = [f for f in os.listdir(SAVE_FOLDER) if
-                      os.path.isfile(os.path.join(SAVE_FOLDER, f)) and f.startswith("LC")]
-    except FileNotFoundError as e:
-        input("Save files not found. Please run the game and generate at least 1 save file. Press enter to exit...")
-        exit(1)
     print(f"Data location: {DATA_FOLDER}\n"
           f"Save files location: {SAVE_FOLDER}\n"
           f"Using password: {PASSWORD} (To change use the -p flag)\n")
-    print("Save files found:")
-    for i, f in enumerate(save_files):
-        print(f"{i}: {f}")
-    # ask for save file to edit
-    while True:
-        try:
-            save_file = int(input("Enter the number of the save file to edit: "))
-        except ValueError or TypeError as e:
-            print("Invalid save file number.")
-            continue
-        if save_file < 0 or save_file >= len(save_files):
-            print("Invalid save file number.")
-            continue
-        break
-    save_file = save_files[save_file]
-    save_file_path = os.path.join(SAVE_FOLDER, save_file)
-    # ask for action
-    SAVE = decrypt(save_file_path, PASSWORD)
+    webview.create_window('LCSE', server)
+    webview.start()
+
+
     ORIGINAL_SAVE = copy.deepcopy(SAVE)
     SNAPSHOTS = []
     if SAVE is None:
@@ -515,7 +359,3 @@ if __name__ == "__main__":
             exit(0)
         else:
             print("Invalid action.")
-    # save and exit
-    print("Saving and exiting...")
-    encrypt(save_file_path, SAVE, PASSWORD)
-    exit(0)
