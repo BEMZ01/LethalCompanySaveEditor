@@ -232,7 +232,7 @@ if __name__ == "__main__":
           f"Using password: {PASSWORD} (To change use the -p flag)\n")
     webview.create_window('LCSE', server)
     webview.start()
-
+    raise SystemExit
 
     ORIGINAL_SAVE = copy.deepcopy(SAVE)
     SNAPSHOTS = []
