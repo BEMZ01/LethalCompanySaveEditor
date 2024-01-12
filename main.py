@@ -151,7 +151,7 @@ def save_close(save_id):
     global ORIGINAL_SAVE
     SAVE = None
     ORIGINAL_SAVE = None
-    return redirect(url_for('index', success="Save file closed successfully!"))
+    return redirect(url_for('index', success="File closed successfully! (Not saved)"))
 
 
 @server.route('/save/<int:save_id>/restore')
