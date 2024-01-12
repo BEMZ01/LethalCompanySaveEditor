@@ -19,7 +19,7 @@ When you first run LethalCompanySaveEditor, Windows Defender SmartScreen might d
 
 ## Future Features
 - Ability to easily insert items into your save
-- GUI
+- ~~GUI~~ Added 12.01.2024
 - Some way to easily define Vector3 coordinates
 
 ## Usage
