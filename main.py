@@ -214,7 +214,7 @@ def save_raw(save_id):
         save = {}
         save['id'] = save_id
         save['name'] = get_save_files()[save_id]
-        save['data'] = demjson3.encode(SAVE, compactly=False, indent_amount=4)
+        save['data'] = demjson3.encode(SAVE, compactly=False, indent_amount=2)
         # load raw.html
         return render_template('raw.html', save=save)
 
@@ -247,11 +247,7 @@ def save_export(save_id):
     global ORIGINAL_SAVE
     if save_id_valid(save_id) is not None:
         return redirect(url_for('index', error=save_id_valid(save_id)))
-    save = {}
-    save['id'] = save_id
-    save['name'] = get_save_files()[save_id]
-    save['data'] = demjson3.encode(SAVE, compactly=False, indent_amount=4)
-    # load export.html
+    save = {"id": save_id, "name": get_save_files()[save_id], "data": demjson3.encode(SAVE)}
     return render_template('export.html', save=save)
 
 
