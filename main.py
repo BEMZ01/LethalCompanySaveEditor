@@ -85,7 +85,7 @@ def check_for_updates():
         if r.status_code != 200:
             print("UPDATE: Error checking for updates. Status code not okay.")
             return False
-        online_version = float(r.text.split('\n')[14].split(' = ')[1])
+        online_version = float(r.text.split('\n')[19].split(' = ')[1])
         local_version = float(VERSION)
         if online_version > local_version:
             print("UPDATE: Update available!")
