@@ -12,6 +12,7 @@ import traceback
 import pyperclip
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify
 import webview
+import ast
 
 server = Flask(__name__, static_folder='static', template_folder='templates')
 server.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -259,6 +260,81 @@ def save_insert(save_id):
     return redirect(url_for('save', error="Not implemented yet", save_id=save_id))
 
 
+def value_is_valid(value, type):
+    """
+    Checks if a value is valid for a given type.
+    :param value: The value to check
+    :param type: The type to check against
+    :return: None if valid, error message if invalid
+    """
+    try:
+        if type == 'int':
+            int(value)
+        elif type == 'bool':
+            if value.lower() not in ['true', 'false']:
+                return "Boolean values must be either true or false."
+        elif type == 'Vector3':
+            # dict containing x, y, and z keys
+            if value.count(',') != 2:
+                return "Vector3 values must have 2 commas."
+            v = ast.literal_eval(value)
+            float(v['x'])
+            float(v['y'])
+            float(v['z'])
+        elif type == 'System.Int32[],mscorlib':
+            v = ast.literal_eval(value)
+            for i in v:
+                int(i)
+        elif type == 'UnityEngine.Vector3[],UnityEngine.CoreModule':
+            if value.count(',') < 2 and value.count('[') != value.count(']') and value.count('{') != value.count('}'):
+                return ("UnityEngine.Vector3[],UnityEngine.CoreModule values must have at least 2 commas and balanced "
+                        "brackets.")
+            v = ast.literal_eval(value)
+            for i in v:
+                float(i['x'])
+                float(i['y'])
+                float(i['z'])
+        else:
+            return f"Unknown type: {type}"
+    except:
+        return f"Error converting value to type {type}. {traceback.format_exc()}"
+    return None
+
+
+def process_value(value, type):
+    """
+    Processes a value to the correct type.
+    :param value: The value to process
+    :param type: The type to process to
+    :return: The processed value
+    """
+    if type == 'int':
+        return int(value)
+    elif type == 'bool':
+        return value.lower() == 'true'
+    elif type == 'Vector3':
+        # dict containing x, y, and z keys
+        v = ast.literal_eval(value)
+        v['x'] = float(v['x'])
+        v['y'] = float(v['y'])
+        v['z'] = float(v['z'])
+        return v
+    elif type == 'System.Int32[],mscorlib':
+        v = ast.literal_eval(value)
+        for i in range(len(v)):
+            v[i] = int(v[i])
+        return v
+    elif type == 'UnityEngine.Vector3[],UnityEngine.CoreModule':
+        v = ast.literal_eval(value)
+        for i in range(len(v)):
+            v[i]['x'] = float(v[i]['x'])
+            v[i]['y'] = float(v[i]['y'])
+            v[i]['z'] = float(v[i]['z'])
+        return v
+    else:
+        return value
+
+
 @server.route('/save/<int:save_id>/modify', methods=['POST', 'GET'])
 def save_modify(save_id):
     global SAVE
@@ -266,20 +342,31 @@ def save_modify(save_id):
     if save_id_valid(save_id) is not None:
         return redirect(url_for('index', error=save_id_valid(save_id)))
     if request.method == 'POST':
-        try:
-            SAVE = demjson3.decode(request.form['textarea'].strip())
-            return redirect(url_for('save', success="Save file modified successfully!", save_id=save_id))
-        except demjson3.JSONDecodeError:
-            print(traceback.format_exc())
-            return redirect(url_for('index', error="Error modifying save file."))
+        new_data = {}
+        r = request.form.to_dict()
+        r = {k: r[k] for k in sorted(r)}
+        # how many keys beginning with K are there?
+        keys_length = len([k for k in r.keys() if k.startswith('K')])
+        values_length = len([k for k in r.keys() if k.startswith('V')])
+        if keys_length != values_length:
+            return redirect(url_for('save', error="Error reading input table. Keys and values are not equal.",
+                                    save_id=save_id))
+        for i in range(keys_length):
+            key = list(r.keys())[i]
+            value = list(r.keys())[i + keys_length]
+            value = r[value]
+            type = list(r.keys())[i + keys_length].split('_')[1]
+            key = key.split('_')[1]
+            if value_is_valid(value, type) is not None:
+                return redirect(url_for('save', error=value_is_valid(value, type), save_id=save_id))
+            new_data[key] = {'__type': type, 'value': value}
+        for k in new_data.keys():
+            SAVE[k] = {"__type": new_data[k]["__type"],
+                       "value": process_value(new_data[k]["value"], new_data[k]["__type"])}
+        return redirect(url_for('save', success="Save file modified successfully!", save_id=save_id))
+
     else:
-        save = {}
-        save['id'] = save_id
-        save['name'] = get_save_files()[save_id]
-        save['data'] = SAVE
-        save['keys'] = list(SAVE.keys())
-        pprint(save)
-        # load modify.html
+        save = {'id': save_id, 'name': get_save_files()[save_id], 'data': SAVE, 'keys': list(SAVE.keys())}
         return render_template('modify.html', save=save)
 
 

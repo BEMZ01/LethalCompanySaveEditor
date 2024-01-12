@@ -35,8 +35,8 @@
                         {% for i in range(0, save['data']|length) %}
                             {% set key = save['data'][save['keys'][i]] %}
                             <tr>
-                                <td><input name="{{save['keys'][i]}}" class="form-control" type="text" value="{{ save['keys'][i] }}" style="width: 100%;" autocomplete="off"></td>
-                                <td><input class="form-control" type="text" value="{{ key['value']}}" style="width: 100%;" autocomplete="off"></td>
+                                <td><input name="K{{i}}_{{save['keys'][i]}}" class="form-control" type="text" value="{{ save['keys'][i] }}" style="width: 100%;" autocomplete="off"></td>
+                                <td><input name="V{{i}}_{{ key['__type'] }}"class="form-control" type="text" value="{{ key['value']}}" style="width: 100%;" autocomplete="off"></td>
                                 <td>{{ key['__type'] }}</td>
                             </tr>
                         {% endfor %}
