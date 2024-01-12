@@ -17,7 +17,7 @@ import ast
 server = Flask(__name__, static_folder='static', template_folder='templates')
 server.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-VERSION = 1.2
+VERSION = 1.5
 
 os.system('color')
 PASSWORD = "lcslime14a5"
@@ -81,7 +81,7 @@ def check_for_updates():
     """Checks for updates to the save editor by downloading main.py from the github repo and comparing the version
     number in the second line."""
     try:
-        r = requests.get("https://raw.githubusercontent.com/BEMZ01/LethalCompanySaveEditor/master/main.py")
+        r = requests.get("https://raw.githubusercontent.com/BEMZ01/LethalCompanySaveEditor/gui-update/main.py")
         if r.status_code != 200:
             print("UPDATE: Error checking for updates. Status code not okay.")
             return False
