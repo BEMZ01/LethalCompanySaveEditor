@@ -1,5 +1,11 @@
 # LethalCompanySaveEditor CLI
 
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/BEMZ01/LethalCompanySaveEditor/total)
+![GitHub Repo stars](https://img.shields.io/github/stars/BEMZ01/LethalCompanySaveEditor?style=flat)
+
+**If you find the save editor useful, please give the repo a star!**
+
+
 **A simple save editor for Lethal Company, written in Python 3.11 for python versions higher than 3.10**
 This should work for any project that utilizes ES3 Saves with encryption, you'll need the save location and the decryption password for the game you wish to edit.
 
