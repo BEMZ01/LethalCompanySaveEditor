@@ -1,4 +1,4 @@
-# code by nikidziuba
+# code by nikidziuba (https://github.com/nikidziuba/PSE/blob/main/save_decode.py)
 
 import hashlib
 from Crypto.Cipher import AES
